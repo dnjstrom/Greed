@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Greed</string>
+    <string name="title_activity_game">GameActivity</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    
+
+    <string name="claim">Claim</string>
+    <string name="points">points</string>
+    <string name="total">total</string>
+    <string name="roll">Roll</string>
+    
+</resources>
