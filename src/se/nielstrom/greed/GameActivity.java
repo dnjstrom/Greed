@@ -10,14 +10,17 @@ import java.util.Random;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 public class GameActivity extends Activity {
 	private DieButton[] diceButtons = new DieButton[6];
-	private int round = 1;
+	private int round = 0;
 	private int totalScore = 0;
 	private int roundScore = 0;
-	private boolean hasRolled = false;
+	private boolean firstRoll = true;
+	
+	private enum Score { OK, LOW, BUST }
 			
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,39 +38,119 @@ public class GameActivity extends Activity {
     	diceButtons[4] = (DieButton)findViewById(R.id.die_e);
     	diceButtons[5] = (DieButton)findViewById(R.id.die_f);
     	
+    	setRound(0);
     	setRoundScore(0);
     	setTotalScore(0);
+    	setFirstRoll(true);
     }
     
     public void rollDice(View v) {
-    	hasRolled = true;
+    	int previousScore = 0;
+    	
+    	if (isFirstRoll()) {
+    		for(DieButton die : diceButtons) {
+        		die.setEnabled(true);
+        	}
+		} else {
+			previousScore = getRoundScore();
+		}
+    	
     	
     	List<Integer> dice = new ArrayList<>(6);
     	
     	for(DieButton die : diceButtons) {
     		if (die.isChecked()) {
-    			int side = (new Random()).nextInt(5) + 1;
+	    		int side = (new Random()).nextInt(5) + 1;
 				die.setText("" + side);
 				dice.add(side);
-			}
+    		} else {
+    			die.setEnabled(false);
+    			int side = Integer.parseInt((String) die.getText());
+    			dice.add(side);
+    		}
     	}
     	
     	int score = calculateScore(dice);
-    	setRoundScore(score);
+    	
+    	if (isFirstRoll() && score < 300) {
+    		setRoundScore(score);
+    		setScoreState(Score.LOW);
+			claimHelper(0);
+		} else if (score <= previousScore) {
+			setRoundScore(0);
+			setScoreState(Score.BUST);
+			claimRound(null);;
+		}else {		
+			setRoundScore(score);
+			setScoreState(Score.OK);
+			setFirstRoll(false);
+		}
     }
+    
+    private void setScoreState(Score state) {
+    	TextView text = (TextView) findViewById(R.id.round_points);
+    	int color_id;
+    	
+    	switch (state) {
+		case LOW:
+			color_id = R.color.score_low;
+			break;
+		case BUST:
+			color_id = R.color.score_bust;
+			break;
+		case OK:
+		default:
+			color_id = R.color.score_ok;
+			break;
+		}
+    	
+    	text.setTextColor(getResources().getColor(color_id));
+    }
+    
     
     public void claimRound(View v) {
-    	if(!hasRolled) {
-    		return;
-    	}
-    	
-    	setTotalScore(getTotalScore() + getRoundScore());
-    	setRoundScore(0);
-    	round++;
-    	hasRolled = false;
+    	claimHelper(getRoundScore());
     }
     
-    public int getRoundScore() {
+    public void claimHelper(int score) {
+    	setTotalScore(getTotalScore() + score);
+    	setRound(getRound() + 1);
+    	setFirstRoll(true);
+    	
+    	for(DieButton die : diceButtons) {
+    		die.setChecked(true);
+    		die.setEnabled(false);
+    	}
+    }
+    
+    
+    public boolean isFirstRoll() {
+		return firstRoll;
+	}
+
+	public void setFirstRoll(boolean firstRoll) {
+		this.firstRoll = firstRoll;
+		Button button = (Button) findViewById(R.id.claim_button);
+		
+		if (firstRoll) {	
+			button.setEnabled(false);
+		} else {
+			button.setEnabled(true);
+		}
+		
+	}
+
+	public int getRound() {
+		return round;
+	}
+
+	public void setRound(int round) {
+		this.round = round;
+		TextView roundText = (TextView) findViewById(R.id.rounds);
+    	roundText.setText(round + " " + getResources().getString(R.string.rounds));
+	}
+
+	public int getRoundScore() {
     	return roundScore;
     }
     

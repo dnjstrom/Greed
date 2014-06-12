@@ -11,5 +11,6 @@
     <string name="points">points</string>
     <string name="total">total</string>
     <string name="roll">Roll</string>
+    <string name="rounds">rounds</string>
     
 </resources>
