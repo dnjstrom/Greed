@@ -63,7 +63,7 @@
                 android:layout_height="fill_parent"
                 android:layout_weight="1"
                 android:checked="true"
-                android:text="DieA" />
+                android:text="1" />
 
             <se.nielstrom.greed.DieButton
                 android:id="@+id/die_b"
@@ -71,7 +71,7 @@
                 android:layout_height="fill_parent"
                 android:layout_weight="1"
                 android:checked="true"
-                android:text="DieB" />
+                android:text="2" />
         </LinearLayout>
 
         <LinearLayout
@@ -87,7 +87,7 @@
                 android:layout_height="fill_parent"
                 android:layout_weight="1"
                 android:checked="true"
-                android:text="DieC" />
+                android:text="3" />
 
             <se.nielstrom.greed.DieButton
                 android:id="@+id/die_d"
@@ -95,7 +95,7 @@
                 android:layout_height="fill_parent"
                 android:layout_weight="1"
                 android:checked="true"
-                android:text="DieD" />
+                android:text="4" />
         </LinearLayout>
 
         <LinearLayout
@@ -110,7 +110,7 @@
                 android:layout_height="fill_parent"
                 android:layout_weight="1"
                 android:checked="true"
-                android:text="DieE" />
+                android:text="5" />
 
             <se.nielstrom.greed.DieButton
                 android:id="@+id/die_f"
@@ -118,7 +118,7 @@
                 android:layout_height="fill_parent"
                 android:layout_weight="1"
                 android:checked="true"
-                android:text="DieF" />
+                android:text="6" />
         </LinearLayout>
 
         <LinearLayout

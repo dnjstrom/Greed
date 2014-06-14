@@ -19,10 +19,13 @@ public class GameActivity extends Activity {
 	private DieButton[] diceButtons = new DieButton[6];
 	private int round = 0;
 	private int totalScore = 0;
+	private int previousScore = 0;
 	private int roundScore = 0;
+	private int roundScoreBonus = 0;
 	private boolean firstRoll = true;
 	
 	public final int minScore = 300;
+	private boolean allDiceUsed;
 	
 	private enum Score { OK, LOW, BUST }
 			
@@ -48,7 +51,7 @@ public class GameActivity extends Activity {
 				public void onStateChange() {
 					checkMinScore();
 				}
-			});	
+			});
     	}
     	
     	setRound(0);
@@ -58,17 +61,22 @@ public class GameActivity extends Activity {
     }
     
     public void rollDice(View v) {
-    	int previousScore = 0;
-    	
-    	if (isFirstRoll()) {
+    	if (isFirstRoll()) {    		
     		for(DieButton die : diceButtons) {
         		die.setEnabled(true);
         		die.setChecked(true);
         	}
-		} else {
-			previousScore = getRoundScore();
+    		previousScore = 0;
+		} else if (allDiceUsed) {
+			allDiceUsed = false;
+			
+    		for(DieButton die : diceButtons) {
+        		die.setEnabled(true);
+        		die.setChecked(true);
+        	}
+    		
+    		roundScoreBonus = previousScore;
 		}
-    	
     	
     	List<Integer> dice = new ArrayList<>(6);
     	
@@ -84,7 +92,13 @@ public class GameActivity extends Activity {
     		}
     	}
     	
-    	int score = calculateScore(dice);
+    	allDiceUsed = allDiceAreUsed(dice);
+    	
+    	if(allDiceUsed) {
+    		System.out.println("");
+    	}
+    	
+    	int score = calculateScore(dice) + roundScoreBonus;
     	
     	if (isFirstRoll() && score < minScore) { // Low initial score
     		setRoundScore(score);
@@ -94,7 +108,7 @@ public class GameActivity extends Activity {
 		} else if (score <= previousScore) { // No new points, bust
 			setRoundScore(0);
 			setScoreState(Score.BUST);
-			claimRound(null);;
+			claimRound(null);
 			enableRollButton(true);
 		}else {
 			setRoundScore(score);
@@ -106,10 +120,26 @@ public class GameActivity extends Activity {
 			}
 			
 			setFirstRoll(false);
+			previousScore = score;
 		}
     }
     
-    private void setScoreState(Score state) {
+    private boolean allDiceAreUsed(List<Integer> dice) {
+    	Map<Integer, Integer> diceMap = aggregateDice(dice);
+    	
+    	if(diceMap.size() != 6) { // unless we have a ladder
+    		for(Entry<Integer, Integer> entry : diceMap.entrySet()) {
+        		if(( entry.getKey() != 1 && entry.getKey() != 5) // if side is 2,3,4 or 6
+    				 && entry.getValue() % 3 != 0 ) { // and the number of dice is not a multiple of 3
+        			return false;
+        		}
+        	}
+    	}
+    	
+    	return true;
+	}
+
+	private void setScoreState(Score state) {
     	TextView text = (TextView) findViewById(R.id.round_points);
     	int color_id;
     	
@@ -139,8 +169,9 @@ public class GameActivity extends Activity {
     		}
     	}
     	
-    	int score = calculateScore(dice);
-		enableRollButton(score >= minScore);	
+    	int score = calculateScore(dice) + roundScoreBonus;
+    	
+    	enableRollButton(score > Math.min(minScore-1, previousScore));
     }
     
     public void claimRound(View v) {
@@ -158,6 +189,7 @@ public class GameActivity extends Activity {
     	setTotalScore(getTotalScore() + score);
     	setRound(getRound() + 1);
     	setFirstRoll(true);
+    	roundScoreBonus = 0;
     	
     	for(DieButton die : diceButtons) {
     		die.setEnabled(false);
@@ -208,13 +240,7 @@ public class GameActivity extends Activity {
 	private int calculateScore(List<Integer> dice) {
 		int score = 0;
 		
-		// Count the number of sides
-		Map<Integer, Integer> diceMap = new HashMap<>(6);
-		for(Integer side: dice) {
-			Integer previousNumber = diceMap.get(side);
-			int newNumber = (previousNumber == null) ? 1 : previousNumber + 1; 
-			diceMap.put(side, newNumber);
-		}
+		Map<Integer, Integer> diceMap = aggregateDice(dice);
 		
 		if (diceMap.size() == 6) { // 6 different sides means it's a ladder
 			score = 1000;
@@ -226,6 +252,18 @@ public class GameActivity extends Activity {
 		}
 		
 		return score;
+	}
+	
+	private Map<Integer, Integer> aggregateDice(List<Integer> dice) {
+		Map<Integer, Integer> diceMap = new HashMap<>(6);
+		
+		for(Integer side: dice) {
+			Integer previousNumber = diceMap.get(side);
+			int newNumber = (previousNumber == null) ? 1 : previousNumber + 1; 
+			diceMap.put(side, newNumber);
+		}
+		
+		return diceMap;
 	}
 	
 	private int scoreHelper(int side, int number) {
