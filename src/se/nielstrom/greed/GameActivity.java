@@ -7,9 +7,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 
+import se.nielstrom.greed.DieButton.StateChangeListener;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -19,6 +21,8 @@ public class GameActivity extends Activity {
 	private int totalScore = 0;
 	private int roundScore = 0;
 	private boolean firstRoll = true;
+	
+	public final int minScore = 300;
 	
 	private enum Score { OK, LOW, BUST }
 			
@@ -38,6 +42,15 @@ public class GameActivity extends Activity {
     	diceButtons[4] = (DieButton)findViewById(R.id.die_e);
     	diceButtons[5] = (DieButton)findViewById(R.id.die_f);
     	
+    	for(DieButton die : diceButtons) {
+    		die.addStateChangeListener(new StateChangeListener() {
+				@Override
+				public void onStateChange() {
+					checkMinScore();
+				}
+			});	
+    	}
+    	
     	setRound(0);
     	setRoundScore(0);
     	setTotalScore(0);
@@ -50,6 +63,7 @@ public class GameActivity extends Activity {
     	if (isFirstRoll()) {
     		for(DieButton die : diceButtons) {
         		die.setEnabled(true);
+        		die.setChecked(true);
         	}
 		} else {
 			previousScore = getRoundScore();
@@ -72,17 +86,25 @@ public class GameActivity extends Activity {
     	
     	int score = calculateScore(dice);
     	
-    	if (isFirstRoll() && score < 300) {
+    	if (isFirstRoll() && score < minScore) { // Low initial score
     		setRoundScore(score);
     		setScoreState(Score.LOW);
 			claimHelper(0);
-		} else if (score <= previousScore) {
+			enableRollButton(true);
+		} else if (score <= previousScore) { // No new points, bust
 			setRoundScore(0);
 			setScoreState(Score.BUST);
 			claimRound(null);;
-		}else {		
+			enableRollButton(true);
+		}else {
 			setRoundScore(score);
 			setScoreState(Score.OK);
+			
+			// Force user to select 300 points worth of dice
+			if (isFirstRoll()) {
+				enableRollButton(false);
+			}
+			
 			setFirstRoll(false);
 		}
     }
@@ -107,9 +129,29 @@ public class GameActivity extends Activity {
     	text.setTextColor(getResources().getColor(color_id));
     }
     
+    private void checkMinScore() {
+    	List<Integer> dice = new ArrayList<>();
+    	
+    	for(DieButton die : diceButtons) {
+    		if (!die.isChecked()) {
+    			int side = Integer.parseInt((String) die.getText());
+    			dice.add(side);
+    		}
+    	}
+    	
+    	int score = calculateScore(dice);
+		enableRollButton(score >= minScore);	
+    }
     
     public void claimRound(View v) {
     	claimHelper(getRoundScore());
+    	setRoundScore(0);
+    	enableRollButton(true);
+    }
+    
+    private void enableRollButton(boolean enable) {
+    	Button button = (Button) findViewById(R.id.roll_button);
+    	button.setEnabled(enable);
     }
     
     public void claimHelper(int score) {
@@ -118,7 +160,6 @@ public class GameActivity extends Activity {
     	setFirstRoll(true);
     	
     	for(DieButton die : diceButtons) {
-    		die.setChecked(true);
     		die.setEnabled(false);
     	}
     }
@@ -130,14 +171,8 @@ public class GameActivity extends Activity {
 
 	public void setFirstRoll(boolean firstRoll) {
 		this.firstRoll = firstRoll;
-		Button button = (Button) findViewById(R.id.claim_button);
-		
-		if (firstRoll) {	
-			button.setEnabled(false);
-		} else {
-			button.setEnabled(true);
-		}
-		
+		Button button = (Button) findViewById(R.id.claim_button);	
+		button.setEnabled(!firstRoll);
 	}
 
 	public int getRound() {

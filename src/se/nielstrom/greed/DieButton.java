@@ -1,5 +1,8 @@
 package se.nielstrom.greed;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.content.Context;
 import android.graphics.Color;
 import android.util.AttributeSet;
@@ -10,6 +13,7 @@ import android.widget.Button;
 
 public class DieButton extends Button implements OnClickListener {
 	private boolean checked;
+	private List<StateChangeListener> listeners;
 
 	public DieButton(Context context) {
 		super(context);
@@ -27,6 +31,7 @@ public class DieButton extends Button implements OnClickListener {
 	}
 	
 	private void init(Context ctx) {
+		listeners = new ArrayList<>();
 		setOnClickListener(this);
 		setChecked(true);
 		setTextColor(Color.BLACK);
@@ -42,13 +47,29 @@ public class DieButton extends Button implements OnClickListener {
 		if (isChecked()) {
 			setBackgroundColor(getResources().getColor(R.color.action));
 		} else {
+			setTextColor(Color.DKGRAY);
 			setBackgroundColor(getResources().getColor(android.R.color.background_dark));
 		}
 	}
+	
+	public void addStateChangeListener(StateChangeListener listener) {
+		listeners.add(listener);
+	}
 
+	public void removeStateChangeListener(StateChangeListener listener) {
+		listeners.remove(listener);
+	}
+	
 	@Override
 	public void onClick(View v) {
 		setChecked(!isChecked());
+		
+		for(StateChangeListener listener : listeners) {
+			listener.onStateChange();
+		}
 	}
-
+	
+	public interface StateChangeListener {
+		public void onStateChange();
+	}
 }
