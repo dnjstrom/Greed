@@ -1,25 +1,24 @@
-<LinearLayout
-    android:orientation="vertical"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    android:orientation="vertical" >
 
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:weightSum="1"
-        android:padding="10dp">
+        android:orientation="horizontal"
+        android:padding="10dp"
+        android:weightSum="1" >
 
         <TextView
+            android:id="@+id/round_points"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="500 points"
-            android:id="@+id/round_points"
+            android:layout_gravity="center"
             android:layout_weight="1"
-            android:textSize="30dp"
-            android:layout_gravity="center" />
+            android:text="500 points"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textSize="30dp" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -43,9 +42,7 @@
                 android:layout_weight="1"
                 android:text="0 rounds"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
-
         </LinearLayout>
-
     </LinearLayout>
 
     <LinearLayout
@@ -64,68 +61,67 @@
             android:text="DieA" />
 
         <se.nielstrom.greed.DieButton
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:text="DieB"
             android:id="@+id/die_b"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
             android:layout_weight="1"
-            android:checked="true" />
+            android:checked="true"
+            android:text="DieB" />
     </LinearLayout>
 
     <LinearLayout
-        android:orientation="horizontal"
+        android:id="@+id/linearLayout2"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:id="@+id/linearLayout2">
+        android:orientation="horizontal" >
 
         <se.nielstrom.greed.DieButton
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:text="DieC"
             android:id="@+id/die_c"
-            android:layout_weight="1"
-            android:checked="true" />
-
-        <se.nielstrom.greed.DieButton
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:text="DieD"
+            android:layout_weight="1"
+            android:checked="true"
+            android:text="DieC" />
+
+        <se.nielstrom.greed.DieButton
             android:id="@+id/die_d"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
             android:layout_weight="1"
-            android:checked="true" />
+            android:checked="true"
+            android:text="DieD" />
     </LinearLayout>
 
     <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1">
-
-        <se.nielstrom.greed.DieButton
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:text="DieE"
-            android:id="@+id/die_e"
-            android:layout_weight="1"
-            android:checked="true" />
-
-        <se.nielstrom.greed.DieButton
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:text="DieF"
-            android:id="@+id/die_f"
-            android:layout_weight="1"
-            android:checked="true" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:layout_marginTop="5dp">
+        android:orientation="horizontal" >
+
+        <se.nielstrom.greed.DieButton
+            android:id="@+id/die_e"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:checked="true"
+            android:text="DieE" />
+
+        <se.nielstrom.greed.DieButton
+            android:id="@+id/die_f"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:checked="true"
+            android:text="DieF" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_weight="1"
+        android:orientation="horizontal" >
 
         <Button
             android:id="@+id/claim_button"
@@ -145,7 +141,6 @@
             android:clickable="true"
             android:onClick="rollDice"
             android:text="@string/roll" />
-
     </LinearLayout>
 
 </LinearLayout>

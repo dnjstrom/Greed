@@ -41,7 +41,7 @@ public class GameActivity extends Activity {
     	setRound(0);
     	setRoundScore(0);
     	setTotalScore(0);
-    	setFirstRoll(true);
+    	setFirstRoll(true); 
     }
     
     public void rollDice(View v) {
