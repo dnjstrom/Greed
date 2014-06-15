@@ -50,6 +50,11 @@ public class DieButton extends Button implements OnClickListener {
 			setTextColor(Color.DKGRAY);
 			setBackgroundColor(getResources().getColor(android.R.color.background_dark));
 		}
+		
+		// Notify listeners
+		for(StateChangeListener listener : listeners) {
+			listener.onStateChange(this);
+		}
 	}
 	
 	public void addStateChangeListener(StateChangeListener listener) {
@@ -63,13 +68,9 @@ public class DieButton extends Button implements OnClickListener {
 	@Override
 	public void onClick(View v) {
 		setChecked(!isChecked());
-		
-		for(StateChangeListener listener : listeners) {
-			listener.onStateChange();
-		}
 	}
 	
 	public interface StateChangeListener {
-		public void onStateChange();
+		public void onStateChange(DieButton button);
 	}
 }

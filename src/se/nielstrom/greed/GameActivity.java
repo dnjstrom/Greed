@@ -16,16 +16,18 @@ import android.widget.Button;
 import android.widget.TextView;
 
 public class GameActivity extends Activity {
-	private DieButton[] diceButtons = new DieButton[6];
+	public final int minScore = 300;
+	public final int nrDice = 6;
+	
+	private DieButton[] diceButtons = new DieButton[nrDice];
 	private int round = 0;
 	private int totalScore = 0;
 	private int previousScore = 0;
 	private int roundScore = 0;
 	private int roundScoreBonus = 0;
 	private boolean firstRoll = true;
-	
-	public final int minScore = 300;
-	private boolean allDiceUsed;
+	private List<Integer> dice = new ArrayList<>(nrDice);
+	private int nrChecked = nrDice;
 	
 	private enum Score { OK, LOW, BUST }
 			
@@ -47,8 +49,10 @@ public class GameActivity extends Activity {
     	
     	for(DieButton die : diceButtons) {
     		die.addStateChangeListener(new StateChangeListener() {
+
 				@Override
-				public void onStateChange() {
+				public void onStateChange(DieButton button) {
+					nrChecked += (button.isChecked()) ? 1 : -1;
 					checkMinScore();
 				}
 			});
@@ -66,19 +70,21 @@ public class GameActivity extends Activity {
         		die.setEnabled(true);
         		die.setChecked(true);
         	}
+    		nrChecked = nrDice;
     		previousScore = 0;
-		} else if (allDiceUsed) {
-			allDiceUsed = false;
-			
+		} else if (allDiceAreUsed(dice) && nrChecked == 0) {
     		for(DieButton die : diceButtons) {
         		die.setEnabled(true);
         		die.setChecked(true);
         	}
-    		
-    		roundScoreBonus = previousScore;
+    		nrChecked = nrDice;
+    		enableRollButton(false);
+    		previousScore = roundScoreBonus = getRoundScore();
+		} else {
+			previousScore = getRoundScore();
 		}
     	
-    	List<Integer> dice = new ArrayList<>(6);
+    	dice.clear();
     	
     	for(DieButton die : diceButtons) {
     		if (die.isChecked()) {
@@ -90,12 +96,6 @@ public class GameActivity extends Activity {
     			int side = Integer.parseInt((String) die.getText());
     			dice.add(side);
     		}
-    	}
-    	
-    	allDiceUsed = allDiceAreUsed(dice);
-    	
-    	if(allDiceUsed) {
-    		System.out.println("");
     	}
     	
     	int score = calculateScore(dice) + roundScoreBonus;
@@ -112,22 +112,16 @@ public class GameActivity extends Activity {
 			enableRollButton(true);
 		}else {
 			setRoundScore(score);
-			setScoreState(Score.OK);
-			
-			// Force user to select 300 points worth of dice
-			if (isFirstRoll()) {
-				enableRollButton(false);
-			}
-			
+			setScoreState(Score.OK);	
+			enableRollButton(false);
 			setFirstRoll(false);
-			previousScore = score;
 		}
     }
     
     private boolean allDiceAreUsed(List<Integer> dice) {
     	Map<Integer, Integer> diceMap = aggregateDice(dice);
     	
-    	if(diceMap.size() != 6) { // unless we have a ladder
+    	if(diceMap.size() != nrDice) { // unless we have a ladder
     		for(Entry<Integer, Integer> entry : diceMap.entrySet()) {
         		if(( entry.getKey() != 1 && entry.getKey() != 5) // if side is 2,3,4 or 6
     				 && entry.getValue() % 3 != 0 ) { // and the number of dice is not a multiple of 3
@@ -160,18 +154,18 @@ public class GameActivity extends Activity {
     }
     
     private void checkMinScore() {
-    	List<Integer> dice = new ArrayList<>();
+    	List<Integer> uncheckedDice = new ArrayList<>();
     	
     	for(DieButton die : diceButtons) {
     		if (!die.isChecked()) {
     			int side = Integer.parseInt((String) die.getText());
-    			dice.add(side);
+    			uncheckedDice.add(side);
     		}
     	}
     	
-    	int score = calculateScore(dice) + roundScoreBonus;
+    	int score = calculateScore(uncheckedDice) + roundScoreBonus;
     	
-    	enableRollButton(score > Math.min(minScore-1, previousScore));
+    	enableRollButton(score > Math.max(minScore-1, previousScore));
     }
     
     public void claimRound(View v) {
@@ -242,7 +236,7 @@ public class GameActivity extends Activity {
 		
 		Map<Integer, Integer> diceMap = aggregateDice(dice);
 		
-		if (diceMap.size() == 6) { // 6 different sides means it's a ladder
+		if (diceMap.size() == nrDice) { // 6 different sides means it's a ladder
 			score = 1000;
 		} else {
 			// Calculate the score for each kind of side
@@ -255,7 +249,7 @@ public class GameActivity extends Activity {
 	}
 	
 	private Map<Integer, Integer> aggregateDice(List<Integer> dice) {
-		Map<Integer, Integer> diceMap = new HashMap<>(6);
+		Map<Integer, Integer> diceMap = new HashMap<>(nrDice);
 		
 		for(Integer side: dice) {
 			Integer previousNumber = diceMap.get(side);
