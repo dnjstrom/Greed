@@ -2,6 +2,7 @@ package se.nielstrom.greed;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -12,8 +13,11 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 
 public class DieButton extends Button implements OnClickListener {
+	public final int nrOfSides = 6;
+	
 	private boolean checked;
 	private List<StateChangeListener> listeners;
+	private int currentSide;
 
 	public DieButton(Context context) {
 		super(context);
@@ -32,6 +36,7 @@ public class DieButton extends Button implements OnClickListener {
 	
 	private void init(Context ctx) {
 		listeners = new ArrayList<>();
+		setCurrentSide(currentSide);
 		setOnClickListener(this);
 		setChecked(true);
 		setTextColor(Color.BLACK);
@@ -41,6 +46,20 @@ public class DieButton extends Button implements OnClickListener {
 		return checked;
 	}
 
+	public int getCurrentSide() {
+		return currentSide;
+	}
+
+	public void setCurrentSide(int currentSide) {
+		this.currentSide = currentSide;
+		setText("" + currentSide);
+	}
+
+	public int roll() {
+		setCurrentSide( (new Random()).nextInt(nrOfSides - 1) + 1 );
+		return currentSide;
+	}
+	
 	public void setChecked(boolean checked) {
 		this.checked = checked;
 		
