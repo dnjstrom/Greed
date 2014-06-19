@@ -4,4 +4,7 @@
     <color name="score_bust">#EF504F</color>
     <color name="score_low">#FFDA66</color>
     <color name="score_ok">#FFFFFF</color>
+    
+    <color name="button_unchecked">#FFFFFF</color>
+    <color name="button_checked">#FFFFFF</color>
 </resources>

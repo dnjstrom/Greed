@@ -228,7 +228,7 @@ public class GameActivity extends Activity {
     }
     
     public void claimRound(View v) {
-    	claimHelper(getRoundScore());
+    	claimHelper(calculateScore() + roundScoreBonus);
     	setRoundScore(0);
     	enableRollButton(true);
     }

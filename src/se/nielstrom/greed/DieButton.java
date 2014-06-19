@@ -6,18 +6,30 @@ import java.util.Random;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.ImageButton;
 
-public class DieButton extends Button implements OnClickListener {
+public class DieButton extends ImageButton implements OnClickListener {
+	private static final int[] STATE_CHECKED = {R.attr.state_checked};
 	public final int nrOfSides = 6;
 	
 	private boolean checked;
 	private List<StateChangeListener> listeners;
-	private int currentSide;
+	private int currentSide = nrOfSides;
+	
+	private Drawable[] drawables = {
+		getResources().getDrawable(R.drawable.die1),
+		getResources().getDrawable(R.drawable.die2),
+		getResources().getDrawable(R.drawable.die3),
+		getResources().getDrawable(R.drawable.die4),
+		getResources().getDrawable(R.drawable.die5),
+		getResources().getDrawable(R.drawable.die6)
+	};
 
 	public DieButton(Context context) {
 		super(context);
@@ -39,7 +51,6 @@ public class DieButton extends Button implements OnClickListener {
 		setCurrentSide(currentSide);
 		setOnClickListener(this);
 		setChecked(true);
-		setTextColor(Color.BLACK);
 	}
 
 	public boolean isChecked() {
@@ -52,7 +63,7 @@ public class DieButton extends Button implements OnClickListener {
 
 	public void setCurrentSide(int currentSide) {
 		this.currentSide = currentSide;
-		setText("" + currentSide);
+		setImageDrawable(drawables[currentSide-1]);
 	}
 
 	public int roll() {
@@ -63,17 +74,21 @@ public class DieButton extends Button implements OnClickListener {
 	public void setChecked(boolean checked) {
 		this.checked = checked;
 		
-		if (isChecked()) {
-			setBackgroundColor(getResources().getColor(R.color.action));
-		} else {
-			setTextColor(Color.DKGRAY);
-			setBackgroundColor(getResources().getColor(android.R.color.background_dark));
-		}
+		refreshDrawableState();
 		
 		// Notify listeners
 		for(StateChangeListener listener : listeners) {
 			listener.onStateChange(this);
 		}
+	}
+	
+	@Override
+	public int[] onCreateDrawableState(int extraSpace) {
+	    final int[] drawableState = super.onCreateDrawableState(extraSpace + 1);
+	    if (isChecked()) {
+	        mergeDrawableStates(drawableState, STATE_CHECKED);
+	    }
+	    return drawableState;
 	}
 	
 	public void addStateChangeListener(StateChangeListener listener) {
