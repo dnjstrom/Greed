@@ -48,6 +48,7 @@ public class GameActivity extends Activity {
     	diceButtons[5] = (DieButton)findViewById(R.id.die_f);
     	
     	for(DieButton die : diceButtons) {
+    		die.setEnabled(false);
     		die.addStateChangeListener(new StateChangeListener() {
 
 				@Override
@@ -62,6 +63,10 @@ public class GameActivity extends Activity {
     	setRoundScore(0);
     	setTotalScore(0);
     	setFirstRoll(true); 
+    	
+    	for(DieButton die : diceButtons) {
+    		die.setEnabled(false);
+    	}
     }
     
     public void rollDice(View v) {
@@ -73,13 +78,13 @@ public class GameActivity extends Activity {
     		nrChecked = nrDice;
     		previousScore = 0;
 		} else if (allDiceAreUsed(dice) && nrChecked == 0) {
+			previousScore = roundScoreBonus = getRoundScore();
     		for(DieButton die : diceButtons) {
         		die.setEnabled(true);
         		die.setChecked(true);
         	}
     		nrChecked = nrDice;
     		enableRollButton(false);
-    		previousScore = roundScoreBonus = getRoundScore();
 		} else {
 			previousScore = getRoundScore();
 		}
@@ -164,6 +169,8 @@ public class GameActivity extends Activity {
     	}
     	
     	int score = calculateScore(uncheckedDice) + roundScoreBonus;
+    	
+    	setRoundScore(score);
     	
     	enableRollButton(score > Math.max(minScore-1, previousScore));
     }
