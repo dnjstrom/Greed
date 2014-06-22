@@ -129,18 +129,23 @@
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
             android:layout_weight="1"
+            android:background="@drawable/claim_button_bg"
             android:clickable="true"
             android:onClick="claimRound"
-            android:text="@string/claim" />
+            android:text="@string/claim"
+            android:textColor="@color/button_text" />
 
         <Button
             android:id="@+id/roll_button"
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
             android:layout_weight="3"
+            android:background="@drawable/roll_button_bg"
             android:clickable="true"
             android:onClick="rollDice"
-            android:text="@string/roll" />
+            android:text="@string/roll"
+            android:textColor="@color/button_text" />
+
     </LinearLayout>
 
 </LinearLayout>
