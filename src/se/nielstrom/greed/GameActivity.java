@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import se.nielstrom.greed.DieButton.StateChangeListener;
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -26,27 +27,29 @@ public class GameActivity extends Activity {
 	private int roundScoreBonus = 0;
 	private boolean firstRoll = true;
 	private int nrChecked = nrDice;
+	private Button claimButton;
+	private Button rollButton;
 	
 	private enum Score { OK, LOW, BUST }
+	
+	private Score scoreState = Score.OK;
 			
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void onCreate(Bundle state) {
+        super.onCreate(state);
         setContentView(R.layout.activity_game);
-    }
-    
-    @Override
-    protected void onResume() {
-    	super.onResume();
-    	diceButtons[0] = (DieButton)findViewById(R.id.die_a);
+        
+        diceButtons[0] = (DieButton)findViewById(R.id.die_a);
     	diceButtons[1] = (DieButton)findViewById(R.id.die_b);
     	diceButtons[2] = (DieButton)findViewById(R.id.die_c);
     	diceButtons[3] = (DieButton)findViewById(R.id.die_d);
     	diceButtons[4] = (DieButton)findViewById(R.id.die_e);
     	diceButtons[5] = (DieButton)findViewById(R.id.die_f);
     	
+    	rollButton = (Button) findViewById(R.id.roll_button);
+    	claimButton = (Button) findViewById(R.id.claim_button);
+        
     	for(DieButton die : diceButtons) {
-    		die.setEnabled(false);
     		die.addStateChangeListener(new StateChangeListener() {
 				@Override
 				public void onStateChange(DieButton button) {
@@ -56,14 +59,56 @@ public class GameActivity extends Activity {
 			});
     	}
     	
-    	setRound(0);
-    	setRoundScore(0);
-    	setTotalScore(0);
-    	setFirstRoll(true); 
+    	// Create activity from scratch
+        if (state == null) {
+        	for(DieButton die : diceButtons) {
+        		die.setEnabled(false);
+        		claimButton.setEnabled(false);
+        	}
+        	
+        	//setRound(0);
+        	//setRoundScore(0);
+        	//setTotalScore(0);
+        	//setFirstRoll(true);
+		} 
     	
-    	for(DieButton die : diceButtons) {
-    		die.setEnabled(false);
-    	}
+    }
+
+    @Override
+    protected void onSaveInstanceState (Bundle bundle) {
+    	super.onSaveInstanceState(bundle);
+    	bundle.putInt("round", getRound());
+    	bundle.putInt("totalScore", getTotalScore());
+    	bundle.putInt("previousScore", previousScore);
+    	bundle.putInt("roundScore", getRoundScore());
+    	bundle.putInt("roundScoreBonus", roundScoreBonus);
+    	bundle.putBoolean("firstRoll", firstRoll);
+    	bundle.putInt("nrChecked", nrChecked);
+    	
+    	bundle.putBoolean("rollButtonEnabled", rollButton.isEnabled());
+    	bundle.putBoolean("claimButtonEnabled", claimButton.isEnabled());
+    	bundle.putSerializable("scoreState", scoreState);
+    }
+    
+    @Override
+    protected void onRestoreInstanceState (Bundle bundle) {
+    	super.onRestoreInstanceState(bundle);
+    	setRound( bundle.getInt("round") );
+    	setTotalScore( bundle.getInt("totalScore") );
+    	previousScore = bundle.getInt("previousScore");
+    	setRoundScore( bundle.getInt("roundScore") );
+    	roundScoreBonus = bundle.getInt("roundScoreBonus");
+    	firstRoll = bundle.getBoolean("firstRoll");
+    	nrChecked = bundle.getInt("nrChecked");
+    	
+    	rollButton.setEnabled( bundle.getBoolean("rollButtonEnabled") );
+    	claimButton.setEnabled( bundle.getBoolean("claimButtonEnabled") );
+    	setScoreState( (Score) bundle.getSerializable("scoreState") );
+    }
+    
+    @Override
+    protected void onResume() {
+    	super.onResume();
     }
     
     public void rollDice(View v) {
@@ -81,7 +126,7 @@ public class GameActivity extends Activity {
         		die.setChecked(true);
         	}
     		nrChecked = nrDice;
-    		enableRollButton(false);
+    		rollButton.setEnabled(false);
 		} else {
 			previousScore = getRoundScore();
 		}
@@ -100,16 +145,16 @@ public class GameActivity extends Activity {
     		setRoundScore(score);
     		setScoreState(Score.LOW);
 			claimHelper(0);
-			enableRollButton(true);
+			rollButton.setEnabled(true);
 		} else if (score <= previousScore) { // No new points, bust
 			setRoundScore(0);
 			setScoreState(Score.BUST);
 			claimRound(null);
-			enableRollButton(true);
+			rollButton.setEnabled(true);
 		}else {
 			setRoundScore(score);
 			setScoreState(Score.OK);	
-			enableRollButton(false);
+			rollButton.setEnabled(false);
 			setFirstRoll(false);
 		}
     }
@@ -224,13 +269,13 @@ public class GameActivity extends Activity {
     	
     	setRoundScore(score);
     	
-    	enableRollButton(score > Math.max(minScore-1, previousScore));
+    	rollButton.setEnabled(score > Math.max(minScore-1, previousScore));
     }
     
     public void claimRound(View v) {
     	claimHelper(calculateScore() + roundScoreBonus);
     	setRoundScore(0);
-    	enableRollButton(true);
+    	rollButton.setEnabled(true);
     }
     
     public void claimHelper(int score) {
@@ -244,17 +289,8 @@ public class GameActivity extends Activity {
     	}
     }
     
-    private void enableRollButton(boolean enable) {
-    	Button button = (Button) findViewById(R.id.roll_button);
-    	button.setEnabled(enable);
-    }
-    
-    private void enableClaimButton(boolean enable) {
-    	Button button = (Button) findViewById(R.id.claim_button);	
-		button.setEnabled(enable);
-    }
-    
 	private void setScoreState(Score state) {
+		scoreState  = state;
     	TextView text = (TextView) findViewById(R.id.round_points);
     	int color_id;
     	
@@ -281,7 +317,7 @@ public class GameActivity extends Activity {
 
 	public void setFirstRoll(boolean firstRoll) {
 		this.firstRoll = firstRoll;
-		enableClaimButton(!firstRoll);
+		claimButton.setEnabled(!firstRoll);
 	}
 
 	public int getRound() {

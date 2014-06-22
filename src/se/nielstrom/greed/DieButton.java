@@ -5,8 +5,11 @@ import java.util.List;
 import java.util.Random;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -43,6 +46,18 @@ public class DieButton extends ImageButton implements OnClickListener {
 
 	public DieButton(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
+		
+		TypedArray a = context.getTheme().obtainStyledAttributes(
+		        attrs,
+		        R.styleable.die_button,
+		        0, 0);
+		
+		try {
+			a.getBoolean(R.styleable.die_button_state_checked, false);
+		} finally {
+			a.recycle();
+		}
+		
 		init(context);
 	}
 	
@@ -50,7 +65,6 @@ public class DieButton extends ImageButton implements OnClickListener {
 		listeners = new ArrayList<>();
 		setCurrentSide(currentSide);
 		setOnClickListener(this);
-		setChecked(true);
 	}
 
 	public boolean isChecked() {
@@ -80,6 +94,34 @@ public class DieButton extends ImageButton implements OnClickListener {
 		for(StateChangeListener listener : listeners) {
 			listener.onStateChange(this);
 		}
+	}
+	
+	@Override
+	public Parcelable onSaveInstanceState() {
+		Bundle bundle = new Bundle();
+		bundle.putParcelable("instanceState", super.onSaveInstanceState());
+		bundle.putBoolean("isEnabled", isEnabled());
+		bundle.putBoolean("isChecked", isChecked());
+		bundle.putInt("side", getCurrentSide());
+		return bundle;
+	}
+
+	@Override
+	public void onRestoreInstanceState(Parcelable state) {
+		if (state instanceof Bundle) {
+			Bundle bundle = (Bundle) state;
+			setCurrentSide(bundle.getInt("side"));
+			setChecked(bundle.getBoolean("isChecked"));
+			setEnabled(bundle.getBoolean("isEnabled"));
+			state = bundle.getParcelable("instanceState");
+		}
+
+		super.onRestoreInstanceState(state);
+	}
+	
+	@Override
+	public void setEnabled(boolean bool) {
+		super.setEnabled(bool);
 	}
 	
 	@Override

@@ -3,14 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res/se.nielstrom.greed">
     
 	<item android:state_pressed="true"
-	      android:drawable="@color/score_low" />
+	      android:drawable="@color/button_pressed" />
 	
 	<item android:state_enabled="false"
-	      android:drawable="@color/score_bust" />
+	      android:drawable="@color/button_disabled" />
 	
-	<item app:state_checked="true"
-	      android:drawable="@color/score_low" />
+	<item app:state_checked="false"
+	      android:drawable="@color/button_checked" />
 	
-	<item android:drawable="@color/action" />
+	<item android:drawable="@color/button_unchecked" />
 	
 </selector>

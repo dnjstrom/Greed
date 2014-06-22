@@ -5,6 +5,8 @@
     <color name="score_low">#FFDA66</color>
     <color name="score_ok">#FFFFFF</color>
     
-    <color name="button_unchecked">#FFFFFF</color>
-    <color name="button_checked">#FFFFFF</color>
+    <color name="button_pressed">#403831</color>
+    <color name="button_checked">#1F5F61</color>
+    <color name="button_unchecked">#0B8185</color>
+    <color name="button_disabled">#36544F</color>
 </resources>
