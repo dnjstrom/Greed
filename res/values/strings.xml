@@ -12,5 +12,7 @@
     <string name="total">total</string>
     <string name="roll">Roll</string>
     <string name="rounds">rounds</string>
+    <string name="winner">Winner</string>
+    <string name="you_scored">You Scored:</string>
     
 </resources>

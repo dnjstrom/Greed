@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 
 import se.nielstrom.greed.DieButton.StateChangeListener;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.view.View;
@@ -16,17 +17,18 @@ import android.widget.Button;
 import android.widget.TextView;
 
 public class GameActivity extends Activity {
-	public final int minScore = 300;
-	public final int nrDice = 6;
+	public static final int MAX_SCORE = 10000;
+	public static final int MIN_SCORE = 300;
+	public static final int NR_OF_DICE = 6;
 	
-	private DieButton[] diceButtons = new DieButton[nrDice];
+	private DieButton[] diceButtons = new DieButton[NR_OF_DICE];
 	private int round = 0;
 	private int totalScore = 0;
 	private int previousScore = 0;
 	private int roundScore = 0;
 	private int roundScoreBonus = 0;
 	private boolean firstRoll = true;
-	private int nrChecked = nrDice;
+	private int nrChecked = NR_OF_DICE;
 	private Button claimButton;
 	private Button rollButton;
 	
@@ -117,7 +119,7 @@ public class GameActivity extends Activity {
         		die.setEnabled(true);
         		die.setChecked(true);
         	}
-    		nrChecked = nrDice;
+    		nrChecked = NR_OF_DICE;
     		previousScore = 0;
 		} else if (allDiceAreUsed() && nrChecked == 0) {
 			previousScore = roundScoreBonus = getRoundScore();
@@ -125,7 +127,7 @@ public class GameActivity extends Activity {
         		die.setEnabled(true);
         		die.setChecked(true);
         	}
-    		nrChecked = nrDice;
+    		nrChecked = NR_OF_DICE;
     		rollButton.setEnabled(false);
 		} else {
 			previousScore = getRoundScore();
@@ -141,7 +143,7 @@ public class GameActivity extends Activity {
     	
     	int score = calculateScore() + roundScoreBonus;
     	
-    	if (isFirstRoll() && score < minScore) { // Low initial score
+    	if (isFirstRoll() && score < MIN_SCORE) { // Low initial score
     		setRoundScore(score);
     		setScoreState(Score.LOW);
 			claimHelper(0);
@@ -175,7 +177,7 @@ public class GameActivity extends Activity {
     private boolean allDiceAreUsed(Integer... sides) {
 		Map<Integer, Integer> diceMap = aggregateDice(sides);
     	
-    	if(diceMap.size() != nrDice) { // unless we have a ladder
+    	if(diceMap.size() != NR_OF_DICE) { // unless we have a ladder
     		for(Entry<Integer, Integer> entry : diceMap.entrySet()) {
         		if(( entry.getKey() != 1 && entry.getKey() != 5) // if side is 2,3,4 or 6
     				 && entry.getValue() % 3 != 0 ) { // and the number of dice is not a multiple of 3
@@ -231,7 +233,7 @@ public class GameActivity extends Activity {
 		
 		Map<Integer, Integer> diceMap = aggregateDice(dice);
 		
-		if (diceMap.size() == nrDice) { // 6 different sides means it's a ladder
+		if (diceMap.size() == NR_OF_DICE) { // 6 different sides means it's a ladder
 			score = 1000;
 		} else {
 			// Calculate the score for each kind of side
@@ -269,7 +271,7 @@ public class GameActivity extends Activity {
     	
     	setRoundScore(score);
     	
-    	rollButton.setEnabled(score > Math.max(minScore-1, previousScore));
+    	rollButton.setEnabled(score > Math.max(MIN_SCORE-1, previousScore));
     }
     
     public void claimRound(View v) {
@@ -287,6 +289,23 @@ public class GameActivity extends Activity {
     	for(DieButton die : diceButtons) {
     		die.setEnabled(false);
     	}
+    	
+    	if (getTotalScore() >= MAX_SCORE) {
+    		Intent intent = new Intent(this, ScoreActivity.class);
+        	intent.putExtra(ScoreActivity.SCORE, getTotalScore());
+        	intent.putExtra(ScoreActivity.ROUNDS, getRound());
+        	startActivityForResult(intent, 0);
+		}
+    }
+    
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    	setTotalScore(0);
+    	setRoundScore(0);
+    	setRound(0);
+    	setFirstRoll(true);
+    	roundScoreBonus = 0;
+    	previousScore = 0;
     }
     
 	private void setScoreState(Score state) {
@@ -326,7 +345,7 @@ public class GameActivity extends Activity {
 
 	public void setRound(int round) {
 		this.round = round;
-		TextView roundText = (TextView) findViewById(R.id.rounds);
+		TextView roundText = (TextView) findViewById(R.id.rounds_label);
     	roundText.setText(round + " " + getResources().getString(R.string.rounds));
 	}
 
