@@ -18,6 +18,7 @@
             android:layout_weight="1"
             android:text="0 points"
             android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/score_bust"
             android:textSize="30dp" />
 
         <LinearLayout
