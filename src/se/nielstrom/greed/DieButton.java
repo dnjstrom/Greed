@@ -17,6 +17,19 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageButton;
 
+/**
+ * A custom view basically existing as a cross between a ToggleButton and an
+ * ImageButton. Tracks the state of a single 6-sided die and displays an
+ * appropriate icon.
+ * 
+ * Besides the normal button states, a DieButton can be checked or unchecked.
+ * These states are implemented using attr.xml and onCreateDrawableState in
+ * order to allow for simple styling using xml drawables and solid color
+ * backgrounds.
+ * 
+ * @author Daniel Ström
+ *
+ */
 public class DieButton extends ImageButton implements OnClickListener {
 	private static final int[] STATE_CHECKED = {R.attr.state_checked};
 	public final int nrOfSides = 6;
@@ -42,58 +55,46 @@ public class DieButton extends ImageButton implements OnClickListener {
 	public DieButton(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		init(context);
+		handleAttributes(context, attrs);
 	}
 
 	public DieButton(Context context, AttributeSet attrs, int defStyle) {
-		super(context, attrs, defStyle);
-		
-		TypedArray a = context.getTheme().obtainStyledAttributes(
-		        attrs,
-		        R.styleable.die_button,
-		        0, 0);
-		
-		try {
-			a.getBoolean(R.styleable.die_button_state_checked, false);
-		} finally {
-			a.recycle();
-		}
-		
+		super(context, attrs, defStyle);		
 		init(context);
+		handleAttributes(context, attrs);
 	}
 	
+
+	/**
+	 * The common constructor operations.
+	 */
 	private void init(Context ctx) {
 		listeners = new ArrayList<>();
 		setCurrentSide(currentSide);
 		setOnClickListener(this);
 	}
+	
+	/**
+	 * Allows the checked state of the view to be set from xml.
+	 */
+	private void handleAttributes(Context context, AttributeSet attrs) {
+		TypedArray a = context.getTheme().obtainStyledAttributes(attrs,
+				R.styleable.die_button, 0, 0);
 
-	public boolean isChecked() {
-		return checked;
+		try {
+			setChecked(a.getBoolean(R.styleable.die_button_state_checked, false));
+		} finally {
+			a.recycle();
+		}
 	}
 
-	public int getCurrentSide() {
-		return currentSide;
-	}
-
-	public void setCurrentSide(int currentSide) {
-		this.currentSide = currentSide;
-		setImageDrawable(drawables[currentSide-1]);
-	}
-
+	/**
+	 * Randomly assigns a value to the die.
+	 * @return The new value
+	 */
 	public int roll() {
 		setCurrentSide( (new Random()).nextInt(nrOfSides - 1) + 1 );
 		return currentSide;
-	}
-	
-	public void setChecked(boolean checked) {
-		this.checked = checked;
-		
-		refreshDrawableState();
-		
-		// Notify listeners
-		for(StateChangeListener listener : listeners) {
-			listener.onStateChange(this);
-		}
 	}
 	
 	@Override
@@ -119,11 +120,10 @@ public class DieButton extends ImageButton implements OnClickListener {
 		super.onRestoreInstanceState(state);
 	}
 	
-	@Override
-	public void setEnabled(boolean bool) {
-		super.setEnabled(bool);
-	}
-	
+	/**
+	 * This methods allow me to add the checked state to the drawable state,
+	 * allowing the view to be styled using xml drawables.
+	 */
 	@Override
 	public int[] onCreateDrawableState(int extraSpace) {
 	    final int[] drawableState = super.onCreateDrawableState(extraSpace + 1);
@@ -146,6 +146,34 @@ public class DieButton extends ImageButton implements OnClickListener {
 		setChecked(!isChecked());
 	}
 	
+	public boolean isChecked() {
+		return checked;
+	}
+
+	public int getCurrentSide() {
+		return currentSide;
+	}
+
+	public void setCurrentSide(int currentSide) {
+		this.currentSide = currentSide;
+		setImageDrawable(drawables[currentSide-1]);
+	}
+	
+	public void setChecked(boolean checked) {
+		this.checked = checked;
+		
+		refreshDrawableState(); // Invalidates the drawable state
+		
+		// Notify listeners of state change
+		for(StateChangeListener listener : listeners) {
+			listener.onStateChange(this);
+		}
+	}
+	
+	/**
+	 * Listener interface for entities that want to be notified when a button's
+	 * checked state is changed.
+	 */
 	public interface StateChangeListener {
 		public void onStateChange(DieButton button);
 	}

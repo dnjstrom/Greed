@@ -7,6 +7,11 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.TextView;
 
+/**
+ * Displays the score and number of rounds in a super rad way.
+ * 
+ * @author Daniel Ström
+ */
 public class ScoreActivity extends Activity {
 	public static final String SCORE = "se.nielstrom.greed.SCORE";
 	public static final String ROUNDS = "se.nielstrom.greed.ROUNDS";
@@ -29,6 +34,7 @@ public class ScoreActivity extends Activity {
 	
 	@Override
 	public void onBackPressed() {
+		// Have the game activity start a new game
 		setResult(RESULT_OK);
 		finish();
 	}
