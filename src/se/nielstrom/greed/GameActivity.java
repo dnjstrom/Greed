@@ -433,8 +433,8 @@ public class GameActivity extends Activity {
 		TextView text = (TextView) findViewById(R.id.round_points);
 		text.setText(roundScore + " " + getResources().getString(R.string.points));
 
+		// Set a color hint depending on the number of points
 		int color_id;
-
 		if (score == 0) {
 			color_id = R.color.score_bust;
 		} else if (score < MIN_SCORE) {

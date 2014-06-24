@@ -17,7 +17,6 @@
             android:layout_gravity="center"
             android:layout_weight="1"
             android:text="0 points"
-            android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="@color/score_bust"
             android:textSize="40sp" />
 
@@ -34,7 +33,6 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="0 total"
-                android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textSize="20sp" />
 
             <TextView
@@ -43,7 +41,6 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="0 rounds"
-                android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textSize="20sp" />
         </LinearLayout>
     </LinearLayout>
@@ -62,7 +59,7 @@
 
             <se.nielstrom.greed.DieButton
                 android:id="@+id/die_a"
-                style="@style/dieButtonStyle"
+                style="@style/dieButtonStyleLand"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_weight="1"
@@ -70,7 +67,7 @@
 
             <se.nielstrom.greed.DieButton
                 android:id="@+id/die_b"
-                style="@style/dieButtonStyle"
+                style="@style/dieButtonStyleLand"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_weight="1"
@@ -86,7 +83,7 @@
 
             <se.nielstrom.greed.DieButton
                 android:id="@+id/die_c"
-                style="@style/dieButtonStyle"
+                style="@style/dieButtonStyleLand"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_weight="1"
@@ -94,7 +91,7 @@
 
             <se.nielstrom.greed.DieButton
                 android:id="@+id/die_d"
-                style="@style/dieButtonStyle"
+                style="@style/dieButtonStyleLand"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_weight="1"
@@ -109,7 +106,7 @@
 
             <se.nielstrom.greed.DieButton
                 android:id="@+id/die_e"
-                style="@style/dieButtonStyle"
+                style="@style/dieButtonStyleLand"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_weight="1"
@@ -117,7 +114,7 @@
 
             <se.nielstrom.greed.DieButton
                 android:id="@+id/die_f"
-                style="@style/dieButtonStyle"
+                style="@style/dieButtonStyleLand"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_weight="1"
@@ -140,7 +137,8 @@
                 android:clickable="true"
                 android:onClick="claimRound"
                 android:text="@string/claim"
-                android:textColor="@color/button_text" />
+                android:textColor="@color/button_text"
+                android:textSize="20sp" />
 
             <Button
                 android:id="@+id/roll_button"
@@ -151,7 +149,9 @@
                 android:clickable="true"
                 android:onClick="rollDice"
                 android:text="@string/roll"
-                android:textColor="@color/button_text" />
+                android:textColor="@color/button_text"
+                android:textSize="20sp" />
+
         </LinearLayout>
     </LinearLayout>
 

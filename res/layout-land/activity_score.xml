@@ -4,48 +4,56 @@
     android:layout_height="fill_parent"
     android:orientation="horizontal" >
 
-    <se.nielstrom.greed.VerticalTextView
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:gravity="bottom"
-        android:text="winner"
-        android:textAllCaps="true"
-        android:includeFontPadding="false"
-        android:textSize="75sp" />
+    <!--
+         I'm consiously using dp instead of sp here since, because of the
+         stylized nature of the text in this layout, I don't want the text to
+         scale depending on the users font-settings
+    -->
 
     <se.nielstrom.greed.VerticalTextView
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:gravity="bottom"
+        android:includeFontPadding="false"
+        android:text="winner"
+        android:textAllCaps="true"
+        android:textSize="75dp" />
+
+    <se.nielstrom.greed.VerticalTextView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="bottom"
+        android:includeFontPadding="false"
         android:text="You Scored:"
         android:textAllCaps="true"
-        android:includeFontPadding="false"
         android:textColor="@color/button_unchecked"
-        android:textSize="40sp" />
+        android:textSize="40dp" />
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_weight="1000"
         android:orientation="vertical" >
-        
+
         <TextView
             android:id="@+id/score"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:gravity="center"
             android:singleLine="true"
             android:text="10000"
             android:textAllCaps="true"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textSize="70sp" />
+            android:textSize="70dp" />
 
         <TextView
             android:id="@+id/score_label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:gravity="center"
             android:singleLine="true"
             android:text="@string/points"
@@ -58,18 +66,20 @@
             android:id="@+id/rounds"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:gravity="center"
             android:singleLine="true"
             android:text="25"
             android:textAllCaps="true"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textSize="70sp" />
+            android:textSize="70dp" />
 
         <TextView
             android:id="@+id/rounds_label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:layout_weight="1"
             android:gravity="center"
             android:singleLine="true"
             android:text="@string/rounds"
@@ -77,7 +87,6 @@
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="@color/button_unchecked"
             android:textSize="40dp" />
-
     </LinearLayout>
 
 </LinearLayout>
