@@ -93,7 +93,7 @@ public class DieButton extends ImageButton implements OnClickListener {
 	 * @return The new value
 	 */
 	public int roll() {
-		setCurrentSide( (new Random()).nextInt(nrOfSides - 1) + 1 );
+		setCurrentSide( (new Random()).nextInt(nrOfSides) + 1);
 		return currentSide;
 	}
 	
