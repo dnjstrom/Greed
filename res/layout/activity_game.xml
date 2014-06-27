@@ -55,7 +55,7 @@
         android:layout_weight="1"
         android:orientation="horizontal" >
 
-        <se.nielstrom.greed.DieButton
+        <se.nielstrom.greed.views.DieButton
             android:id="@+id/die_a"
             style="@style/dieButtonStyle"
             android:layout_width="fill_parent"
@@ -63,7 +63,7 @@
             android:layout_weight="1"
             android:text="1" />
 
-        <se.nielstrom.greed.DieButton
+        <se.nielstrom.greed.views.DieButton
             android:id="@+id/die_b"
             style="@style/dieButtonStyle"
             android:layout_width="fill_parent"
@@ -79,7 +79,7 @@
         android:layout_weight="1"
         android:orientation="horizontal" >
 
-        <se.nielstrom.greed.DieButton
+        <se.nielstrom.greed.views.DieButton
             android:id="@+id/die_c"
             style="@style/dieButtonStyle"
             android:layout_width="fill_parent"
@@ -87,7 +87,7 @@
             android:layout_weight="1"
             android:text="3" />
 
-        <se.nielstrom.greed.DieButton
+        <se.nielstrom.greed.views.DieButton
             android:id="@+id/die_d"
             style="@style/dieButtonStyle"
             android:layout_width="fill_parent"
@@ -102,7 +102,7 @@
         android:layout_weight="1"
         android:orientation="horizontal" >
 
-        <se.nielstrom.greed.DieButton
+        <se.nielstrom.greed.views.DieButton
             android:id="@+id/die_e"
             style="@style/dieButtonStyle"
             android:layout_width="fill_parent"
@@ -110,7 +110,7 @@
             android:layout_weight="1"
             android:text="5" />
 
-        <se.nielstrom.greed.DieButton
+        <se.nielstrom.greed.views.DieButton
             android:id="@+id/die_f"
             style="@style/dieButtonStyle"
             android:layout_width="fill_parent"

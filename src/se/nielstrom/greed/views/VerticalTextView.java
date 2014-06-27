@@ -1,4 +1,4 @@
-package se.nielstrom.greed;
+package se.nielstrom.greed.views;
 
 import android.content.Context;
 import android.graphics.Canvas;

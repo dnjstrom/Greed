@@ -1,9 +1,15 @@
-package se.nielstrom.greed;
+package se.nielstrom.greed.views;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import se.nielstrom.greed.R;
+import se.nielstrom.greed.R.attr;
+import se.nielstrom.greed.R.drawable;
+import se.nielstrom.greed.R.styleable;
+import se.nielstrom.greed.models.Die;
+import se.nielstrom.greed.models.Die.DieChangeListener;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
@@ -30,13 +36,14 @@ import android.widget.ImageButton;
  * @author Daniel Ström
  *
  */
-public class DieButton extends ImageButton implements OnClickListener {
+public class DieButton extends ImageButton implements OnClickListener, DieChangeListener {
 	private static final int[] STATE_CHECKED = {R.attr.state_checked};
-	public final int nrOfSides = 6;
+	public static final int NR_OF_SIDES = 6;
 	
 	private boolean checked;
 	private List<StateChangeListener> listeners;
-	private int currentSide = nrOfSides;
+	
+	private Die die;
 	
 	private Drawable[] drawables = {
 		getResources().getDrawable(R.drawable.die1),
@@ -69,8 +76,9 @@ public class DieButton extends ImageButton implements OnClickListener {
 	 * The common constructor operations.
 	 */
 	private void init(Context ctx) {
+		setDie( new Die(NR_OF_SIDES) );
+		die.addChangeListener(this);
 		listeners = new ArrayList<>();
-		setCurrentSide(currentSide);
 		setOnClickListener(this);
 	}
 	
@@ -88,13 +96,18 @@ public class DieButton extends ImageButton implements OnClickListener {
 		}
 	}
 
-	/**
-	 * Randomly assigns a value to the die.
-	 * @return The new value
-	 */
-	public int roll() {
-		setCurrentSide( (new Random()).nextInt(nrOfSides) + 1);
-		return currentSide;
+	
+	public Die getDie() {
+		return die;
+	}
+	
+	public void setDie(Die die) {
+		if(this.die != null) {
+			die.removeChangeListener(this);
+		}
+		
+		this.die = die;
+		this.die.addChangeListener(this);
 	}
 	
 	@Override
@@ -103,7 +116,7 @@ public class DieButton extends ImageButton implements OnClickListener {
 		bundle.putParcelable("instanceState", super.onSaveInstanceState());
 		bundle.putBoolean("isEnabled", isEnabled());
 		bundle.putBoolean("isChecked", isChecked());
-		bundle.putInt("side", getCurrentSide());
+		bundle.putInt("currentValue", die.getValue());
 		return bundle;
 	}
 
@@ -111,7 +124,7 @@ public class DieButton extends ImageButton implements OnClickListener {
 	public void onRestoreInstanceState(Parcelable state) {
 		if (state instanceof Bundle) {
 			Bundle bundle = (Bundle) state;
-			setCurrentSide(bundle.getInt("side"));
+			die.setValue(bundle.getInt("currentValue"));
 			setChecked(bundle.getBoolean("isChecked"));
 			setEnabled(bundle.getBoolean("isEnabled"));
 			state = bundle.getParcelable("instanceState");
@@ -133,14 +146,6 @@ public class DieButton extends ImageButton implements OnClickListener {
 	    return drawableState;
 	}
 	
-	public void addStateChangeListener(StateChangeListener listener) {
-		listeners.add(listener);
-	}
-
-	public void removeStateChangeListener(StateChangeListener listener) {
-		listeners.remove(listener);
-	}
-	
 	@Override
 	public void onClick(View v) {
 		setChecked(!isChecked());
@@ -148,15 +153,6 @@ public class DieButton extends ImageButton implements OnClickListener {
 	
 	public boolean isChecked() {
 		return checked;
-	}
-
-	public int getCurrentSide() {
-		return currentSide;
-	}
-
-	public void setCurrentSide(int currentSide) {
-		this.currentSide = currentSide;
-		setImageDrawable(drawables[currentSide-1]);
 	}
 	
 	public void setChecked(boolean checked) {
@@ -168,6 +164,19 @@ public class DieButton extends ImageButton implements OnClickListener {
 		for(StateChangeListener listener : listeners) {
 			listener.onStateChange(this);
 		}
+	}
+	
+	@Override
+	public void onDieChanged(Die die) {
+		setImageDrawable(drawables[die.getValue() - 1]);
+	}
+	
+	public void addStateChangeListener(StateChangeListener listener) {
+		listeners.add(listener);
+	}
+
+	public void removeStateChangeListener(StateChangeListener listener) {
+		listeners.remove(listener);
 	}
 	
 	/**

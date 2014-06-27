@@ -10,7 +10,7 @@
          scale depending on the users font-settings
     -->
 
-    <se.nielstrom.greed.VerticalTextView
+    <se.nielstrom.greed.views.VerticalTextView
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_weight="1"
@@ -20,7 +20,7 @@
         android:textAllCaps="true"
         android:textSize="75dp" />
 
-    <se.nielstrom.greed.VerticalTextView
+    <se.nielstrom.greed.views.VerticalTextView
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_weight="1"
