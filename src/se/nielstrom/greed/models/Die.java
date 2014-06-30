@@ -1,9 +1,13 @@
 package se.nielstrom.greed.models;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class Die {
 	private final int NR_OF_SIDES;
+	private final List<DieChangeListener> changeListeners;
+	
 	private int value;
 	private boolean locked;
 
@@ -13,6 +17,7 @@ public class Die {
 
 	public Die(int nrOfSides) {
 		NR_OF_SIDES = nrOfSides;
+		changeListeners = new ArrayList<>();
 		setValue(NR_OF_SIDES);
 	}
 
@@ -34,6 +39,11 @@ public class Die {
 		}
 
 		this.value = value;
+		
+		for(DieChangeListener listener : changeListeners) {
+			listener.onDieChanged(this);
+		}
+		
 		return this;
 	}
 
@@ -43,35 +53,26 @@ public class Die {
 
 	public Die setLocked(boolean locked) {
 		this.locked = locked;
+		for(DieChangeListener listener : changeListeners) {
+			listener.onDieChanged(this);
+		}
 		return this;
 	}
 
-	public static void main(String[] args) {
-		Die die = new Die(6);
-		System.out.println("" + die.getValue());
+	public void addChangeListener(DieChangeListener listener) {
+		changeListeners.add(listener);
+		listener.onDieChanged(this);
+	}
 
-		System.out.println("-----");
+	public void removeChangeListener(DieChangeListener listener) {
+		changeListeners.remove(listener);
+	}
 
-		System.out.println("" + die.setValue(1).getValue());
-		System.out.println("" + die.setValue(3).getValue());
-		System.out.println("" + die.setValue(6).getValue());
+	public interface DieChangeListener {
+		public void onDieChanged(Die die);
+	}
 
-		System.out.println("-----");
-
-		for (int i=1; i<=100; i++) {
-			System.out.print(die.roll().getValue());
-			if (i % 20 == 0) {
-				System.out.println("");
-			}
-		}
-
-		System.out.println("-----");
-
-		die.setValue(6);
-		die.setLocked(true);
-		for (int i=1; i<=10; i++) {
-			System.out.print(die.roll().getValue());
-		}
-
+	public void toggleLocked() {
+		setLocked(!isLocked());
 	}
 }

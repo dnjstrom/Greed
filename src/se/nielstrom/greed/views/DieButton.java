@@ -76,9 +76,9 @@ public class DieButton extends ImageButton implements OnClickListener, DieChange
 	 * The common constructor operations.
 	 */
 	private void init(Context ctx) {
+		listeners = new ArrayList<>();
 		setDie( new Die(NR_OF_SIDES) );
 		die.addChangeListener(this);
-		listeners = new ArrayList<>();
 		setOnClickListener(this);
 	}
 	
@@ -148,7 +148,7 @@ public class DieButton extends ImageButton implements OnClickListener, DieChange
 	
 	@Override
 	public void onClick(View v) {
-		setChecked(!isChecked());
+		getDie().toggleLocked();
 	}
 	
 	public boolean isChecked() {
@@ -166,8 +166,13 @@ public class DieButton extends ImageButton implements OnClickListener, DieChange
 		}
 	}
 	
+	public void toggleChecked() {
+		setChecked(!isChecked());
+	}
+	
 	@Override
 	public void onDieChanged(Die die) {
+		setChecked(die.isLocked());
 		setImageDrawable(drawables[die.getValue() - 1]);
 	}
 	

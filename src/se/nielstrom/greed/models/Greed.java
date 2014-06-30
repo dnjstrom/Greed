@@ -1,16 +1,35 @@
+package se.nielstrom.greed.models;
+
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.*;
 import java.util.Map.Entry;
 
 public class Greed {
-	private static final int NR_OF_DICE = 6;
-	private static final int NR_OF_SIDES = 6;
-	private static final int MIN_SCORE = 300;
+	public static final int NR_OF_DICE = 6;
+	public static final int NR_OF_SIDES = 6;
+	public static final int MIN_SCORE = 300;
+	public static final int WINNING_SCORE = 10000;
+	public static final String ROUND_SCORE = "scoreRound";
+	public static final String TOTAL_SCORE = "scoreTotal";
+	public static final String ROUNDS = "rounds";
+	public static final String STATE = "state";
+	public static final String WIN = "win";
 
 	private final Die[] dice;
-	private int scoreTotal;
-	private int scoreRound;
+	private int totalScore;
+	private int roundScore;
 	private int scoreRoundBonus;
 	private int round;
+	
+	private PropertyChangeSupport propertyListeners;
+	
+	public static enum State {
+		BUST, LOW, OK, WIN
+	};
+	private State state;
+	private int previousScore;
 
 	public Greed() {
 		dice = new Die[6];
@@ -18,10 +37,14 @@ public class Greed {
 			dice[i] = new Die(NR_OF_SIDES);
 		}
 
-		scoreTotal = 0;
-		scoreRound = 0;
+		totalScore = 0;
+		roundScore = 0;
 		scoreRoundBonus = 0;
 		round = 0;
+		previousScore = 0;
+		state = State.BUST;
+		
+		propertyListeners = new PropertyChangeSupport(this);
 	}
 
 	public Greed roll() {
@@ -30,13 +53,25 @@ public class Greed {
 			setAllDiceLocked(false);
 		}
 
+		previousScore = (getState() == State.OK) ? getScoreRound() : 0;
+		
 		rollDice();
-
+		
 		int score = calculateScore() + scoreRoundBonus;
 
-		// Low score or bust
-		if ( score <= Math.max(MIN_SCORE-1, getScoreRound()) ) {
-
+		// Bust or Low score
+		if (getState() == State.OK && score <= getScoreRound()) {
+			setRound(getRound() + 1);
+			setAllDiceLocked(false);
+			scoreRoundBonus = 0;
+			setState(State.BUST);
+		} else if (score < MIN_SCORE-1) {
+			setRound(getRound() + 1);
+			setAllDiceLocked(false);
+			scoreRoundBonus = 0;
+			setState(State.LOW);
+		} else {
+			setState(State.OK);
 		}
 
 		setScoreRound(score);
@@ -44,21 +79,35 @@ public class Greed {
 		return this;
 	}
 
+	public State getState() {
+		return state;
+	}
+
+	public Greed setState(State state) {
+		if (this.state != state) {			
+			propertyListeners.firePropertyChange(STATE, this.state, state);
+			this.state = state;
+		}
+		return this;
+	}
+
 	public int getScoreRound() {
-		return scoreRound;
+		return roundScore;
 	}
 
 	public Greed setScoreRound(int roundScore) {
-		this.scoreRound = roundScore;
+		propertyListeners.firePropertyChange(ROUND_SCORE, this.roundScore, roundScore);
+		this.roundScore = roundScore;
 		return this;
 	}
 
 	public int getScoreTotal() {
-		return scoreTotal;
+		return totalScore;
 	}
 
 	public Greed setScoreTotal(int totalScore) {
-		this.scoreTotal = totalScore;
+		propertyListeners.firePropertyChange(TOTAL_SCORE, this.totalScore, totalScore);
+		this.totalScore = totalScore;
 		return this;
 	}
 
@@ -68,10 +117,18 @@ public class Greed {
 	}
 
 	public Greed claim() {
-		appendScoreTotal(getScoreRound());
-		setScoreRound(0);
-		setAllDiceLocked(false);
-		setRound( getRound() + 1 );
+		if (getState() == State.OK) {
+			appendScoreTotal(calculateScore() + scoreRoundBonus);
+			setScoreRound(0);
+			scoreRoundBonus = 0;
+			setAllDiceLocked(false);
+			setRound( getRound() + 1 );
+			setState(State.BUST);
+			
+			if (getScoreTotal() >= WINNING_SCORE) {
+				setState(State.WIN);
+			}
+		}
 		return this;
 	}
 
@@ -108,8 +165,13 @@ public class Greed {
 	}
 
 	public Greed setRound(int round) {
+		propertyListeners.firePropertyChange(ROUNDS, this.round, round);
 		this.round = round;
 		return this;
+	}
+	
+	public Die[] getDice() {
+		return dice;
 	}
 
 	public Greed reset() {
@@ -277,86 +339,38 @@ public class Greed {
 			return 0;
 		}
 	}
+	
+	public void addPropertyChangeListener(PropertyChangeListener listener) {
+        propertyListeners.addPropertyChangeListener(listener);
+    }
+    
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        propertyListeners.removePropertyChangeListener(listener);
+    }
 
+	public boolean updateScore() {
+		List<Integer> lockedDice = new ArrayList<>();
 
-	////////////////////////////////////////
-	/////          Debugging           /////
-	/////   (poor mans Unit-testing)   /////
-	////////////////////////////////////////
-
-	public static void main(String[] args) {
-		Greed game = new Greed();
-		game.printDiceLn();
-
-		game.printHeadline("Rolling dice");
-
-		for (int i=0; i<5; i++) {
-			game.rollDice().printDice();
-			System.out.println(": " + game.calculateScore());
-		}
-
-		game.printHeadline("Overflow turn")
-			.reset()
-			.setDice(1,2,3,4,5,6)
-			.setAllDiceLocked(true)
-			.setScoreRound(game.calculateScore())
-			.printState();
-
-		game.roll().printState();
-
-		game.printHeadline("Claiming a turn")
-			.reset()
-			.setDice(1,2,3,4,5,6)
-			.setAllDiceLocked(true)
-			.setScoreRound(game.calculateScore())
-			.printState();
-
-		game.claim().printState();
-
-	}
-
-	private Greed printState() {
-		printDice();
-		System.out.println(" ("
-			+ getRound()
-			+ "): "
-			+ getScoreRound()
-			+ ", "
-			+ getScoreTotal()
-		);
-		return this;
-	}
-
-	private Greed setDice(Integer... values) {
-		for (int i=0; i<dice.length && i<values.length; i++) {
-			dice[i].setValue(values[i]);
-		}
-		return this;
-	}
-
-	private Greed printDice() {
+		// Only care about checked dice
 		for (Die die : dice) {
-			System.out.print("" + die.getValue());
-		}
-		return this;
-	}
-
-	private Greed printDiceLn() {
-		printDice();
-		System.out.println("");
-		return this;
-	}
-
-	private Greed printHeadline(String headline) {
-		System.out.println("");
-		System.out.println(headline);
-
-		for (char c : headline.toCharArray()) {
-			System.out.print("-");
+			if (die.isLocked()) {
+				lockedDice.add(die.getValue());
+			}
 		}
 
-		System.out.println("");
-		return this;
+		int score = calculateScore(lockedDice) + scoreRoundBonus;
+
+		setScoreRound(score); // Update the score
+		return getState() != State.OK || score > Math.max(MIN_SCORE-1, previousScore);
 	}
 
+	public void resetGame() {
+		setRound(0);
+		setScoreRound(0);
+		setScoreTotal(0);
+		for(Die die : dice) {
+			die.setValue(6);
+			die.setLocked(false);
+		}
+	}
 }

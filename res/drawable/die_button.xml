@@ -9,8 +9,9 @@
 	      android:drawable="@color/button_disabled" />
 	
 	<item app:state_checked="false"
-	      android:drawable="@color/button_checked" />
+	      android:drawable="@color/button_unchecked" />
 	
-	<item android:drawable="@color/button_unchecked" />
+	<item android:drawable="@color/button_checked" />
+	
 	
 </selector>
