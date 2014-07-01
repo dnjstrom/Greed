@@ -2,25 +2,18 @@ package se.nielstrom.greed.views;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import se.nielstrom.greed.R;
-import se.nielstrom.greed.R.attr;
-import se.nielstrom.greed.R.drawable;
-import se.nielstrom.greed.R.styleable;
 import se.nielstrom.greed.models.Die;
 import se.nielstrom.greed.models.Die.DieChangeListener;
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Button;
 import android.widget.ImageButton;
 
 /**

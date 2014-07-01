@@ -60,16 +60,14 @@
             style="@style/dieButtonStyle"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:layout_weight="1"
-            android:text="1" />
+            android:layout_weight="1" />
 
         <se.nielstrom.greed.views.DieButton
             android:id="@+id/die_b"
             style="@style/dieButtonStyle"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:layout_weight="1"
-            android:text="2" />
+            android:layout_weight="1" />
     </LinearLayout>
 
     <LinearLayout
@@ -84,16 +82,14 @@
             style="@style/dieButtonStyle"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:layout_weight="1"
-            android:text="3" />
+            android:layout_weight="1" />
 
         <se.nielstrom.greed.views.DieButton
             android:id="@+id/die_d"
             style="@style/dieButtonStyle"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:layout_weight="1"
-            android:text="4" />
+            android:layout_weight="1" />
     </LinearLayout>
 
     <LinearLayout
@@ -107,16 +103,14 @@
             style="@style/dieButtonStyle"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:layout_weight="1"
-            android:text="5" />
+            android:layout_weight="1" />
 
         <se.nielstrom.greed.views.DieButton
             android:id="@+id/die_f"
             style="@style/dieButtonStyle"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:layout_weight="1"
-            android:text="6" />
+            android:layout_weight="1" />
     </LinearLayout>
 
     <LinearLayout

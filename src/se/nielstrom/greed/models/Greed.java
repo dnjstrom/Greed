@@ -1,16 +1,28 @@
 package se.nielstrom.greed.models;
 
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
-public class Greed {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+/**
+ * The Greed class implements the rules and functionality of the game.
+ * 
+ * @author Daniel
+ */
+public class Greed implements Parcelable{
 	public static final int NR_OF_DICE = 6;
 	public static final int NR_OF_SIDES = 6;
 	public static final int MIN_SCORE = 300;
 	public static final int WINNING_SCORE = 10000;
+	
 	public static final String ROUND_SCORE = "scoreRound";
 	public static final String TOTAL_SCORE = "scoreTotal";
 	public static final String ROUNDS = "rounds";
@@ -28,10 +40,12 @@ public class Greed {
 	public static enum State {
 		BUST, LOW, OK, WIN
 	};
+	
 	private State state;
 	private int previousScore;
 
 	public Greed() {
+		propertyListeners = new PropertyChangeSupport(this);
 		dice = new Die[6];
 		for (int i=0; i<NR_OF_DICE; i++) {
 			dice[i] = new Die(NR_OF_SIDES);
@@ -43,10 +57,29 @@ public class Greed {
 		round = 0;
 		previousScore = 0;
 		state = State.BUST;
-		
-		propertyListeners = new PropertyChangeSupport(this);
 	}
 
+	public Greed(Parcel parcel) {
+		propertyListeners = new PropertyChangeSupport(this);
+		dice = new Die[6];
+		for (int i=0; i<NR_OF_DICE; i++) {
+			dice[i] = new Die(NR_OF_SIDES);
+			dice[i].setValue(parcel.readInt());
+			dice[i].setLocked(parcel.readByte() != 0);
+		}
+		
+		setRound( parcel.readInt() );
+		setScoreRound( parcel.readInt() );
+		setScoreTotal( parcel.readInt() );
+		previousScore = parcel.readInt();
+		scoreRoundBonus = parcel.readInt();
+		setState( (State) parcel.readSerializable() );
+	}
+
+	/**
+	 * One of two primary actions  
+	 * @return
+	 */
 	public Greed roll() {
 		if (allDiceAreLocked() && allDiceAreUsed()) {
 			scoreRoundBonus += getScoreRound();
@@ -373,4 +406,36 @@ public class Greed {
 			die.setLocked(false);
 		}
 	}
+
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		for(int i=0; i<dice.length; i++) {
+			dest.writeInt(dice[i].getValue());
+			dest.writeByte( (byte) (dice[i].isLocked() ? 1 : 0) );
+		}
+		dest.writeInt(getRound());
+		dest.writeInt(getScoreRound());
+		dest.writeInt(getScoreTotal());
+		dest.writeInt(previousScore);
+		dest.writeInt(scoreRoundBonus);
+		dest.writeSerializable(getState());
+	}
+	
+	public static final Parcelable.Creator<Greed> CREATOR = new Parcelable.Creator<Greed>() {
+		@Override
+		public Greed createFromParcel(Parcel parcel) {
+			return new Greed(parcel);
+		}
+
+		@Override
+		public Greed[] newArray(int size) {
+			return new Greed[size];
+		}
+		
+	};
 }

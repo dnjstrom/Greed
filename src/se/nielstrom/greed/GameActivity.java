@@ -9,7 +9,6 @@ import se.nielstrom.greed.views.DieButton;
 import se.nielstrom.greed.views.DieButton.StateChangeListener;
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -31,7 +30,12 @@ public class GameActivity extends Activity implements StateChangeListener {
 		super.onCreate(state);
 		setContentView(R.layout.activity_game);
 		
-		game = new Greed();
+		if (state == null) {
+			game = new Greed();
+		} else {
+			game = state.getParcelable("game");
+		}
+		
 		game.addPropertyChangeListener(new GameChangeListener());
 		
 		// Store a reference to all six custom die views
@@ -47,17 +51,40 @@ public class GameActivity extends Activity implements StateChangeListener {
 		for(int i=0; i<dieButtons.length; i++) {
 			dieButtons[i].setDie(dice[i]);
 			dieButtons[i].addStateChangeListener(this);
-			dieButtons[i].setEnabled(false);
+			//dieButtons[i].setEnabled(false);
 		}
 		
 		// Action button references
 		rollButton = (Button) findViewById(R.id.roll_button);
+		rollButton.setEnabled( state != null ? state.getBoolean("roll") : true );
 		claimButton = (Button) findViewById(R.id.claim_button);
-		claimButton.setEnabled(false);
+		claimButton.setEnabled( state != null ? state.getBoolean("claim") : false );
 		
 		totalPoints = (TextView) findViewById(R.id.total_points);
 		roundPoints = (TextView) findViewById(R.id.round_points);
 		rounds = (TextView) findViewById(R.id.rounds_label);
+		
+		if (state != null) {
+			updateGameState();
+		} else {
+			for(DieButton button : dieButtons) {
+				button.setEnabled(false);
+			}
+		}
+	}
+	
+	private void updateGameState() {
+		roundPoints.setText(game.getScoreRound() + " " + getResources().getString(R.string.points));
+		totalPoints.setText(game.getScoreTotal() + " " + getResources().getString(R.string.points));
+		rounds.setText(game.getRound() + " " + getResources().getString(R.string.rounds));
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle bundle) {
+		super.onSaveInstanceState(bundle);
+		bundle.putParcelable("game", game);
+		bundle.putBoolean("claim", claimButton.isEnabled());
+		bundle.putBoolean("roll", rollButton.isEnabled());
 	}
 	
 	/**
@@ -132,7 +159,7 @@ public class GameActivity extends Activity implements StateChangeListener {
 					roundPoints.setTextColor(getResources().getColor(R.color.score_ok));
 					setButtonsEnabled(true);
 					break;
-				case LOW:					
+				case LOW:
 					claimButton.setEnabled(false);
 					rollButton.setEnabled(true);
 					roundPoints.setTextColor(getResources().getColor(R.color.score_low));
