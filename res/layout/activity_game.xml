@@ -16,7 +16,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1"
-            android:text="0 points"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="@color/score_bust"
             android:textSize="40sp" />
@@ -33,7 +32,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="0 total"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textSize="20sp" />
 
@@ -42,7 +40,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="0 rounds"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textSize="20sp" />
         </LinearLayout>

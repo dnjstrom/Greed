@@ -16,7 +16,6 @@ import android.widget.TextView;
 
 
 public class GameActivity extends Activity implements StateChangeListener {
-
 	private DieButton[] dieButtons;
 	private Button rollButton;
 	private Button claimButton;
@@ -51,7 +50,6 @@ public class GameActivity extends Activity implements StateChangeListener {
 		for(int i=0; i<dieButtons.length; i++) {
 			dieButtons[i].setDie(dice[i]);
 			dieButtons[i].addStateChangeListener(this);
-			//dieButtons[i].setEnabled(false);
 		}
 		
 		// Action button references
@@ -67,6 +65,7 @@ public class GameActivity extends Activity implements StateChangeListener {
 		if (state != null) {
 			updateGameState();
 		} else {
+			
 			for(DieButton button : dieButtons) {
 				button.setEnabled(false);
 			}
@@ -74,9 +73,17 @@ public class GameActivity extends Activity implements StateChangeListener {
 	}
 	
 	private void updateGameState() {
-		roundPoints.setText(game.getScoreRound() + " " + getResources().getString(R.string.points));
-		totalPoints.setText(game.getScoreTotal() + " " + getResources().getString(R.string.points));
-		rounds.setText(game.getRound() + " " + getResources().getString(R.string.rounds));
+		setPoints(roundPoints, game.getScoreRound());
+		setPoints(totalPoints, game.getScoreTotal());
+		setRound(rounds, game.getRound());
+	}
+	
+	private void setPoints(TextView text, int points) {
+		text.setText(points + " " + getResources().getString(R.string.points));
+	}
+	
+	private void setRound(TextView text, int rounds) {
+		text.setText(rounds + " " + getResources().getString(R.string.rounds));
 	}
 
 	@Override
@@ -143,13 +150,13 @@ public class GameActivity extends Activity implements StateChangeListener {
 		public void propertyChange(PropertyChangeEvent event) {
 			switch (event.getPropertyName()) {
 			case Greed.ROUND_SCORE:
-				roundPoints.setText(event.getNewValue() + " " + getResources().getString(R.string.points));
+				setPoints(roundPoints, (int) event.getNewValue());
 				break;
 			case Greed.TOTAL_SCORE:
-				totalPoints.setText(event.getNewValue() + " " + getResources().getString(R.string.points));
+				setPoints(totalPoints, (int) event.getNewValue());
 				break;
 			case Greed.ROUNDS:
-				rounds.setText(event.getNewValue() + " " + getResources().getString(R.string.rounds));
+				setRound(rounds, (int) event.getNewValue());
 				break;
 			case Greed.STATE:
 				switch ((Greed.State) event.getNewValue()) {
