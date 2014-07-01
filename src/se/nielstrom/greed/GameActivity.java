@@ -14,7 +14,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-
+/**
+ * The GameActivity is the main activity which connects the Greed model with the
+ * associated views. Tries to be as "thin" as possible.
+ * 
+ * @author Daniel Ström
+ */
 public class GameActivity extends Activity implements StateChangeListener {
 	private DieButton[] dieButtons;
 	private Button rollButton;
@@ -46,6 +51,7 @@ public class GameActivity extends Activity implements StateChangeListener {
 		dieButtons[4] = (DieButton) findViewById(R.id.die_e);
 		dieButtons[5] = (DieButton) findViewById(R.id.die_f);
 		
+		// connect buttons and dice
 		Die[] dice = game.getDice();
 		for(int i=0; i<dieButtons.length; i++) {
 			dieButtons[i].setDie(dice[i]);
@@ -58,6 +64,7 @@ public class GameActivity extends Activity implements StateChangeListener {
 		claimButton = (Button) findViewById(R.id.claim_button);
 		claimButton.setEnabled( state != null ? state.getBoolean("claim") : false );
 		
+		// Status texts
 		totalPoints = (TextView) findViewById(R.id.total_points);
 		roundPoints = (TextView) findViewById(R.id.round_points);
 		rounds = (TextView) findViewById(R.id.rounds_label);
@@ -65,25 +72,17 @@ public class GameActivity extends Activity implements StateChangeListener {
 		if (state != null) {
 			updateGameState();
 		} else {
-			
+			// Disable all buttons on game start
 			for(DieButton button : dieButtons) {
 				button.setEnabled(false);
 			}
 		}
 	}
 	
-	private void updateGameState() {
-		setPoints(roundPoints, game.getScoreRound());
-		setPoints(totalPoints, game.getScoreTotal());
-		setRound(rounds, game.getRound());
-	}
-	
-	private void setPoints(TextView text, int points) {
-		text.setText(points + " " + getResources().getString(R.string.points));
-	}
-	
-	private void setRound(TextView text, int rounds) {
-		text.setText(rounds + " " + getResources().getString(R.string.rounds));
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		// Returning from the score activity, start a new game.
+		game.reset();
 	}
 
 	@Override
@@ -93,7 +92,7 @@ public class GameActivity extends Activity implements StateChangeListener {
 		bundle.putBoolean("claim", claimButton.isEnabled());
 		bundle.putBoolean("roll", rollButton.isEnabled());
 	}
-	
+
 	/**
 	 * The callback run when the player clicks the roll button.
 	 * 
@@ -112,12 +111,25 @@ public class GameActivity extends Activity implements StateChangeListener {
 		game.claim();
 	}
 
+	/**
+	 * Called whenever a DieButtons checked-state changes. Updates the score
+	 * and action buttons according to what buttons are checked.
+	 */
 	@Override
 	public void onStateChange(DieButton button) {
 		rollButton.setEnabled(game.updateScore());
 		roundPoints.setTextColor(getScoreColor(game.getScoreRound()));
 	}
-	
+
+	/**
+	 * Updates the score and round information
+	 */
+	private void updateGameState() {
+		setPoints(roundPoints, game.getScoreRound());
+		setPoints(totalPoints, game.getScoreTotal());
+		setRound(rounds, game.getRound());
+	}
+
 	private void setButtonsEnabled(boolean enabled) {
 		for(DieButton button : dieButtons) {
 			button.setEnabled(enabled);
@@ -139,12 +151,18 @@ public class GameActivity extends Activity implements StateChangeListener {
 
 	}
 	
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		// Returning from the score activity, start a new game.
-		game.resetGame();
+	private void setPoints(TextView text, int points) {
+		text.setText(points + " " + getResources().getString(R.string.points));
 	}
-	
+
+	private void setRound(TextView text, int rounds) {
+		text.setText(rounds + " " + getResources().getString(R.string.rounds));
+	}
+
+	/**
+	 * A PropertyChangeListener implementation which listens to game events
+	 * and takes appropriate action on the interface to maintain sync.
+	 */
 	private class GameChangeListener implements PropertyChangeListener {
 		@Override
 		public void propertyChange(PropertyChangeEvent event) {

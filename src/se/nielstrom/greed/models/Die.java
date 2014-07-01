@@ -4,6 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Models a die with any number of sides and which value can be locked, disallowing
+ * any changes until it's unlocked again. Classes interested in the value of the
+ * die can implement the DieChangeListener interface and register themselves to
+ * get updates.
+ * 
+ * @author Daniel Ström
+ */
 public class Die {
 	private final int NR_OF_SIDES;
 	private final List<DieChangeListener> changeListeners;
@@ -12,7 +20,7 @@ public class Die {
 	private boolean locked;
 
 	public Die() {
-		this(6);
+		this(6); // Default as 6-sided die
 	}
 
 	public Die(int nrOfSides) {
@@ -40,6 +48,7 @@ public class Die {
 
 		this.value = value;
 		
+		// send update to listeners
 		for(DieChangeListener listener : changeListeners) {
 			listener.onDieChanged(this);
 		}
@@ -59,6 +68,10 @@ public class Die {
 		return this;
 	}
 
+	public void toggleLocked() {
+		setLocked(!isLocked());
+	}
+
 	public void addChangeListener(DieChangeListener listener) {
 		changeListeners.add(listener);
 		listener.onDieChanged(this);
@@ -70,9 +83,5 @@ public class Die {
 
 	public interface DieChangeListener {
 		public void onDieChanged(Die die);
-	}
-
-	public void toggleLocked() {
-		setLocked(!isLocked());
 	}
 }
